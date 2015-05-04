@@ -290,12 +290,16 @@ uis.directive('uiSelectMultiple', ['uiSelectMinErr','$timeout', function(uiSelec
               stashArr = stashArr.slice(1,stashArr.length);
             }
             newItem = $select.tagging.fct($select.search);
-            newItem.isTag = true;
-            // verify the the tag doesn't match the value of an existing item
-            if ( stashArr.filter( function (origItem) { return angular.equals( origItem, $select.tagging.fct($select.search) ); } ).length > 0 ) {
-              return;
+
+            //Check if the tagging is declined
+            if(newItem !== null){
+              newItem.isTag = true;
+              // verify the the tag doesn't match the value of an existing item
+              if ( stashArr.filter( function (origItem) { return angular.equals( origItem, $select.tagging.fct($select.search) ); } ).length > 0 ) {
+                return;
+              }
+              newItem.isTag = true;
             }
-            newItem.isTag = true;
           // handle newItem string and stripping dupes in tagging string context
           } else {
             // find any tagging items already in the $select.items array and store them
@@ -342,11 +346,15 @@ uis.directive('uiSelectMultiple', ['uiSelectMinErr','$timeout', function(uiSelec
           // dupe found, shave the first item
           if ( dupeIndex > -1 ) {
             items = items.slice(dupeIndex+1,items.length-1);
-          } else {
+          } else{
             items = [];
-            items.push(newItem);
+            //push only if the item is not null
+            if(newItem !== null){
+              items.push(newItem);  
+            }
             items = items.concat(stashArr);
           }
+
           scope.$evalAsync( function () {
             $select.activeIndex = 0;
             $select.items = items;
